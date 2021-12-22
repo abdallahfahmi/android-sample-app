@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fawry.task.databinding.FragmentHomeBinding
 import com.fawry.task.ui.base.BaseFragment
@@ -14,6 +15,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : BaseFragment() {
 
     private var binding by autoCleared<FragmentHomeBinding>()
+
+    private val viewModel by viewModels<HomeViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +34,7 @@ class HomeFragment : BaseFragment() {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToMovieDetailsFragment())
         }
 
+        viewModel
     }
 
 }
