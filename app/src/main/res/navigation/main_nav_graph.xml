@@ -18,5 +18,9 @@
         android:id="@+id/movieDetailsFragment"
         android:name="com.fawry.task.ui.main.movie_details.MovieDetailsFragment"
         android:label="MovieDetailsFragment"
-        tools:layout="@layout/fragment_movie_details" />
+        tools:layout="@layout/fragment_movie_details">
+        <argument
+            android:name="movieId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

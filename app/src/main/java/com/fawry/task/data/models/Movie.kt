@@ -1,13 +1,18 @@
 package com.fawry.task.data.models
 
 import androidx.annotation.NonNull
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import com.fawry.task.data.database.Converter
 
 @Entity(tableName = "movies")
 data class Movie(
     @PrimaryKey
     @NonNull
-    val id: String = "",
-    val title: String?
+    val id: Int,
+    val title: String?,
+    val poster_path: String?,
+    val overview: String?,
+    val vote_average: Double?,
+    @TypeConverters(Converter::class)
+    val genre_ids: List<Int> = listOf()
 )
