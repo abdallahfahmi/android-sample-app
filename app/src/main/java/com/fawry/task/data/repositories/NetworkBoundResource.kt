@@ -20,36 +20,21 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
 
             if (shouldFetch(data)) { //database is empty, fetch from remote
 
-                /**nulllllllllllllllllllllllllllllllllls*/
-
                 result.postValue(RemoteResult.loading())
 
-                val categories = fetchRemoteCategories()
-
-                saveCategoriesToDB(categories.data!!)
-
-                //fetch movies of each category concurrently and save them to database
-                val jobs = arrayListOf<Deferred<Unit>>()
-                categories.data.forEach {
-                    jobs.add(async { fetchRemoteMoviesWriteToDatabase(it.id) })
+                try {
+                    //sync with server and wait until all data is written in database
+                    syncMoviesWithRemote()
+                    result.postValue(RemoteResult.success(loadFromDb()!!))
+                } catch (e: Exception) {
+                    result.postValue(RemoteResult.error(e))
                 }
 
-                //wait for all movies to be fetched and written in database before return the list to the user
-                awaitAll(*jobs.toTypedArray())
-
-                result.postValue(RemoteResult.success(loadFromDb()!!))
-
             } else { //return cached data
-                result.postValue(RemoteResult.success(data!!))
+                result.postValue(RemoteResult.success(data!!)) /**fix this*/
             }
 
         }
-    }
-
-    private suspend fun fetchRemoteMoviesWriteToDatabase(categoryId: Int) {
-        val movies = fetchRemoteMovies(categoryId)
-        saveMoviesToDB(movies.data!!)
-        /*********************************************/
     }
 
     @WorkerThread
@@ -59,15 +44,6 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
     abstract fun shouldFetch(data: ResultType?): Boolean
 
     @WorkerThread
-    abstract suspend fun fetchRemoteCategories(): RemoteResult<List<Category>>
-
-    @WorkerThread
-    abstract suspend fun fetchRemoteMovies(categoryId: Int): RemoteResult<List<Movie>>
-
-    @WorkerThread
-    abstract suspend fun saveCategoriesToDB(data: List<Category>)
-
-    @WorkerThread
-    abstract suspend fun saveMoviesToDB(data: List<Movie>)
+    abstract suspend fun syncMoviesWithRemote()
 
 }

@@ -1,7 +1,7 @@
 package com.fawry.task.ui.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.fawry.task.R
 import dagger.hilt.android.AndroidEntryPoint
 

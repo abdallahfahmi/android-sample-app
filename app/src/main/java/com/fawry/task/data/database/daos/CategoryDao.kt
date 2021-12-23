@@ -10,12 +10,12 @@ import com.fawry.task.data.models.Category
 interface CategoryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg category: Category)
+    suspend fun insert(vararg category: Category)
 
     @Query("SELECT * FROM categories")
-    fun getCategories(): List<Category>?
+    suspend fun getCategories(): List<Category>
 
     @Query("DELETE FROM categories")
-    fun deleteAllCategories()
+    suspend fun deleteAllCategories()
 
 }

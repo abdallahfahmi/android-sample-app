@@ -4,7 +4,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fawry.task.data.models.GenreMovies
+import com.fawry.task.data.models.CategorizedMovies
 import com.fawry.task.data.models.Movie
 import com.fawry.task.databinding.GenresListItemBinding
 
@@ -12,12 +12,12 @@ class GenresAdapter(
     private val onMovieClicked: (Movie) -> Unit
 ) : RecyclerView.Adapter<GenresAdapter.ViewHolder>() {
 
-    private var items: List<GenreMovies> = listOf()
+    private var items: List<CategorizedMovies> = listOf()
 
     private val scrollPosition =
         hashMapOf<Int, Parcelable?>()  //save the scroll state of each genre list when scrolling
 
-    fun updateList(items: List<GenreMovies>) {
+    fun updateList(items: List<CategorizedMovies>) {
         this.items = items
         notifyDataSetChanged()
     }

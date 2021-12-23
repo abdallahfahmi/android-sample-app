@@ -10,12 +10,12 @@ import com.fawry.task.data.models.Movie
 interface MovieDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg movies: Movie)
+    suspend fun insert(vararg movies: Movie)
 
     @Query("SELECT * FROM movies")
-    fun getMovies(): List<Movie>?
+    suspend fun getMovies(): List<Movie>
 
     @Query("DELETE FROM movies")
-    fun deleteAllMovies()
+    suspend fun deleteAllMovies()
 
 }

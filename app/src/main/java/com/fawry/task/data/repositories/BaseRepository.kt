@@ -4,7 +4,7 @@ import com.fawry.task.data.network.RemoteResult
 
 abstract class BaseRepository {
 
-    suspend fun <T> makeApiCall(apiCall: suspend () -> T): RemoteResult<T> {
+    suspend fun <T> makeSafeApiCall(apiCall: suspend () -> T): RemoteResult<T> {
         return try {
             return RemoteResult.success(apiCall.invoke())
         } catch (e: Exception) {
