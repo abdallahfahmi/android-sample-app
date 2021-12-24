@@ -1,18 +1,21 @@
 package com.fawry.task.data.models.entities
 
 import androidx.annotation.NonNull
-import androidx.room.*
-import com.fawry.task.data.database.Converter
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "movies")
-data class Movie(
+data class Movie @JvmOverloads constructor(
     @PrimaryKey
     @NonNull
-    val id: Int,
+    @SerializedName("id")
+    val movieId: Int,
     val title: String?,
     val poster_path: String?,
     val overview: String?,
     val vote_average: Double?,
-    @TypeConverters(Converter::class)
+    @Ignore
     val genre_ids: List<Int> = listOf()
 )

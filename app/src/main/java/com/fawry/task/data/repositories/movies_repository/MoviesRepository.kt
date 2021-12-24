@@ -1,8 +1,10 @@
 package com.fawry.task.data.repositories.movies_repository
 
+import android.util.Log
 import com.fawry.task.data.database.AppDatabase
 import com.fawry.task.data.models.entities.CategorizedMovies
 import com.fawry.task.data.models.entities.Category
+import com.fawry.task.data.models.entities.CategoryMovie
 import com.fawry.task.data.models.entities.Movie
 import com.fawry.task.data.network.APIsService
 import com.fawry.task.data.network.RemoteResult
@@ -16,25 +18,24 @@ class MoviesRepository @Inject constructor(
     private val localDataSource: AppDatabase
 ) : BaseRepository(), IMoviesRepository {
 
+    suspend fun queryCategorizedMoviesFromDB() =
+        localDataSource.categoryMovieDao().getCategoryWithMovies()
+
     override fun getMoviesCategorized(coroutineScope: CoroutineScope) =
         object : NetworkBoundResource<List<CategorizedMovies>>(coroutineScope) {
 
-            override suspend fun loadFromDb(): List<CategorizedMovies>? {
-                val categories = getCategoriesFromDB()
-                val movies = getMoviesFromDB()
-                return if (categories.isNullOrEmpty() || movies.isNullOrEmpty())
-                    null
-                else groupCategoriesAndMovies(categories, movies)
+            override suspend fun loadFromDb(): List<CategorizedMovies> {
+                return queryCategorizedMoviesFromDB()
             }
 
             /**
              * this function to decide whether we need to fetch from remote api or not
-             * in case cache got cleared
+             * in case cache got cleared (movies won't be fetched until next scheduled 4 hours)
              * */
-            override fun shouldFetch(data: List<CategorizedMovies>?): Boolean {
+            override fun shouldFetch(data: List<CategorizedMovies>): Boolean {
                 /**fetch from remote api if database is empty,
                  * otherwise return the cached movies from database and don't proceed */
-                return data == null
+                return data.isEmpty()
 
                 //check if worker status is running to avoid multiple sync
             }
@@ -53,7 +54,7 @@ class MoviesRepository @Inject constructor(
         //fetch movies of each category concurrently and save them to database
         val concurrentTasks = arrayListOf<Deferred<Unit>>()
         categories.forEach {
-            concurrentTasks.add(scope.async(Dispatchers.IO) { fetchRemoteMoviesAndSaveToDatabase(it.id) })
+            concurrentTasks.add(scope.async(Dispatchers.IO) { fetchRemoteMoviesAndSaveToDatabase(it.categoryId) })
         }
 
         //wait for all movies to be fetched and written in database
@@ -61,25 +62,24 @@ class MoviesRepository @Inject constructor(
     }
 
     override suspend fun fetchMovieDetails(movieId: Int): RemoteResult<Movie> {
-
-        /**return throwable instead of safe*/
-
         return makeSafeApiCall {
             remoteDataSource.fetchMovieById(movieId)
         }
     }
 
 
-    private suspend fun getCategoriesFromDB() = localDataSource.categoriesDao().getCategories()
-
     private suspend fun saveCategoriesToDB(categories: List<Category>) {
         localDataSource.categoriesDao().insert(*categories.toTypedArray())
     }
 
-    private suspend fun getMoviesFromDB() = localDataSource.moviesDao().getMovies()
-
     private suspend fun saveMoviesToDB(movies: List<Movie>) {
         localDataSource.moviesDao().insert(*movies.toTypedArray())
+        //add foreign keys of movies and category (many to many relation)
+        movies.forEach { movie ->
+            movie.genre_ids.forEach { categoryId ->
+                localDataSource.categoryMovieDao().insert(CategoryMovie(categoryId, movie.movieId))
+            }
+        }
     }
 
     private suspend fun fetchRemoteCategories() = remoteDataSource.fetchCategories().genres
@@ -90,21 +90,6 @@ class MoviesRepository @Inject constructor(
     private suspend fun fetchRemoteMoviesAndSaveToDatabase(categoryId: Int) {
         val movies = fetchRemoteMovies(categoryId)
         saveMoviesToDB(movies)
-    }
-
-    private fun groupCategoriesAndMovies(
-        categories: List<Category>,
-        movies: List<Movie>
-    ): List<CategorizedMovies> {
-        val list = arrayListOf<CategorizedMovies>()
-        categories.forEach { category ->
-            list.add(
-                CategorizedMovies(
-                    category,
-                    movies.filter { it.genre_ids.contains(category.id) })
-            )
-        }
-        return list
     }
 
 }

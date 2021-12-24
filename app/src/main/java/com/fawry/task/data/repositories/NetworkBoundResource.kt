@@ -3,7 +3,9 @@ package com.fawry.task.data.repositories
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import com.fawry.task.data.network.RemoteResult
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
 
@@ -23,23 +25,24 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
                 try {
                     //sync with server and wait until all data is written in database
                     syncMoviesWithRemote()
-                    result.postValue(RemoteResult.success(loadFromDb()!!))
+                    result.postValue(RemoteResult.success(loadFromDb()))
                 } catch (e: Exception) {
+                    //pass the error to the view in case network failed during sync
                     result.postValue(RemoteResult.error(e))
                 }
 
             } else { //return cached data
-                result.postValue(RemoteResult.success(data!!)) /**fix this*/
+                result.postValue(RemoteResult.success(data))
             }
 
         }
     }
 
     @WorkerThread
-    abstract suspend fun loadFromDb(): ResultType?
+    abstract suspend fun loadFromDb(): ResultType
 
     @WorkerThread
-    abstract fun shouldFetch(data: ResultType?): Boolean
+    abstract fun shouldFetch(data: ResultType): Boolean
 
     @WorkerThread
     abstract suspend fun syncMoviesWithRemote()

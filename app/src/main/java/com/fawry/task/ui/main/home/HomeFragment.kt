@@ -57,7 +57,7 @@ class HomeFragment : BaseFragment() {
     private fun setupRecyclerView() {
         adapter = GenresAdapter {
             findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToMovieDetailsFragment(it.id)
+                HomeFragmentDirections.actionHomeFragmentToMovieDetailsFragment(it.movieId)
             )
         }
         binding.genreList.adapter = adapter
