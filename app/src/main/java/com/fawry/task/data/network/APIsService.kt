@@ -1,7 +1,8 @@
 package com.fawry.task.data.network
 
-import com.fawry.task.data.models.http.CategoriesResponse
+import com.fawry.task.BuildConfig
 import com.fawry.task.data.models.entities.Movie
+import com.fawry.task.data.models.http.CategoriesResponse
 import com.fawry.task.data.models.http.MoviesResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -9,12 +10,21 @@ import retrofit2.http.Query
 
 interface APIsService {
 
-    @GET("genre/movie/list?api_key=c50f5aa4e7c95a2a553d29b81aad6dd0&language=en-US")
-    suspend fun fetchCategories(): CategoriesResponse
+    @GET("genre/movie/list")
+    suspend fun fetchCategories(
+        @Query("api_key") apiKey: String = BuildConfig.API_KEY
+    ): CategoriesResponse
 
-    @GET("discover/movie?api_key=c50f5aa4e7c95a2a553d29b81aad6dd0&language=en-US")
-    suspend fun fetchMovies(@Query("with_genres") genreId: Int): MoviesResponse
+    @GET("discover/movie")
+    suspend fun fetchMovies(
+        @Query("with_genres") genreId: Int,
+        @Query("api_key") apiKey: String = BuildConfig.API_KEY
+    ): MoviesResponse
 
-    @GET("movie/{movie_id}?api_key=c50f5aa4e7c95a2a553d29b81aad6dd0")
-    suspend fun fetchMovieById(@Path("movie_id") id: Int): Movie
+    @GET("movie/{movie_id}")
+    suspend fun fetchMovieById(
+        @Path("movie_id") id: Int,
+        @Query("api_key") apiKey: String = BuildConfig.API_KEY
+    ): Movie
+
 }
