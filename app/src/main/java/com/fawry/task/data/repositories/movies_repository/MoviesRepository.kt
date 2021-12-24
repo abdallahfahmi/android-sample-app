@@ -1,6 +1,5 @@
 package com.fawry.task.data.repositories.movies_repository
 
-import android.util.Log
 import com.fawry.task.data.database.AppDatabase
 import com.fawry.task.data.models.entities.CategorizedMovies
 import com.fawry.task.data.models.entities.Category
@@ -18,12 +17,13 @@ class MoviesRepository @Inject constructor(
     private val localDataSource: AppDatabase
 ) : BaseRepository(), IMoviesRepository {
 
-    suspend fun queryCategorizedMoviesFromDB() =
-        localDataSource.categoryMovieDao().getCategoryWithMovies()
-
     override fun getMoviesCategorized(coroutineScope: CoroutineScope) =
         object : NetworkBoundResource<List<CategorizedMovies>>(coroutineScope) {
 
+            //this approach is better than manually starting the worker and observing its state
+            // to update the movies list because here we can propagate any failure to the user
+            // and guarantee a response unlike worker that can be retried several times
+            // before fetching the movies
             override suspend fun loadFromDb(): List<CategorizedMovies> {
                 return queryCategorizedMoviesFromDB()
             }
@@ -35,9 +35,8 @@ class MoviesRepository @Inject constructor(
             override fun shouldFetch(data: List<CategorizedMovies>): Boolean {
                 /**fetch from remote api if database is empty,
                  * otherwise return the cached movies from database and don't proceed */
-                return data.isEmpty()
-
-                //check if worker status is running to avoid multiple sync
+                return false
+//                return data.isEmpty()
             }
 
             override suspend fun syncMoviesWithRemote() {
@@ -49,17 +48,31 @@ class MoviesRepository @Inject constructor(
     override suspend fun syncMoviesFromRemoteServer(scope: CoroutineScope) {
 
         val categories = fetchRemoteCategories()
+        clearDatabase()
         saveCategoriesToDB(categories)
 
         //fetch movies of each category concurrently and save them to database
         val concurrentTasks = arrayListOf<Deferred<Unit>>()
         categories.forEach {
-            concurrentTasks.add(scope.async(Dispatchers.IO) { fetchRemoteMoviesAndSaveToDatabase(it.categoryId) })
+            concurrentTasks.add(
+                scope.async(Dispatchers.IO) {
+                    val movies = fetchRemoteMoviesOfCategory(it.categoryId)
+                    saveMoviesToDB(movies)
+                }
+            )
         }
 
         //wait for all movies to be fetched and written in database
         awaitAll(*concurrentTasks.toTypedArray())
     }
+
+    private suspend fun queryCategorizedMoviesFromDB() =
+        localDataSource.categoryMovieDao().getCategoryWithMovies()
+
+    private suspend fun fetchRemoteCategories() = remoteDataSource.fetchCategories().genres
+
+    private suspend fun fetchRemoteMoviesOfCategory(categoryId: Int) =
+        remoteDataSource.fetchMovies(categoryId).results
 
     override suspend fun fetchMovieDetails(movieId: Int): RemoteResult<Movie> {
         return makeSafeApiCall {
@@ -67,14 +80,13 @@ class MoviesRepository @Inject constructor(
         }
     }
 
-
     private suspend fun saveCategoriesToDB(categories: List<Category>) {
         localDataSource.categoriesDao().insert(*categories.toTypedArray())
     }
 
     private suspend fun saveMoviesToDB(movies: List<Movie>) {
         localDataSource.moviesDao().insert(*movies.toTypedArray())
-        //add foreign keys of movies and category (many to many relation)
+        //add movieId with its corresponding categoryId in CategoryMovie table  (many to many relation)
         movies.forEach { movie ->
             movie.genre_ids.forEach { categoryId ->
                 localDataSource.categoryMovieDao().insert(CategoryMovie(categoryId, movie.movieId))
@@ -82,14 +94,10 @@ class MoviesRepository @Inject constructor(
         }
     }
 
-    private suspend fun fetchRemoteCategories() = remoteDataSource.fetchCategories().genres
-
-    private suspend fun fetchRemoteMovies(categoryId: Int) =
-        remoteDataSource.fetchMovies(categoryId).results
-
-    private suspend fun fetchRemoteMoviesAndSaveToDatabase(categoryId: Int) {
-        val movies = fetchRemoteMovies(categoryId)
-        saveMoviesToDB(movies)
+    private suspend fun clearDatabase() {
+        localDataSource.categoriesDao().deleteAllCategories()
+        localDataSource.moviesDao().deleteAllMovies()
+        localDataSource.categoryMovieDao().deleteAllCategoryMovie()
     }
 
 }

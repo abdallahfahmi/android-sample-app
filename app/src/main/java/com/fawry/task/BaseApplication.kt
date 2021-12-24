@@ -1,6 +1,7 @@
 package com.fawry.task
 
 import android.app.Application
+import android.util.Log
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.*
 import com.fawry.task.data.services.RemoteSyncWorker
@@ -17,6 +18,7 @@ class BaseApplication : Application(), Configuration.Provider {
     override fun getWorkManagerConfiguration() =
         Configuration.Builder()
             .setWorkerFactory(workerFactory)
+            .setMinimumLoggingLevel(Log.DEBUG)
             .build()
 
     override fun onCreate() {
@@ -29,7 +31,7 @@ class BaseApplication : Application(), Configuration.Provider {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val task = PeriodicWorkRequestBuilder<RemoteSyncWorker>(15, TimeUnit.MINUTES)
+        val task = PeriodicWorkRequestBuilder<RemoteSyncWorker>(15, TimeUnit.MINUTES, 13, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 

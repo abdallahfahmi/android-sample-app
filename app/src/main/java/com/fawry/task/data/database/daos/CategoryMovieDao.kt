@@ -14,4 +14,7 @@ interface CategoryMovieDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg categoryMovie: CategoryMovie)
 
+    @Query("DELETE FROM categorymovie")
+    suspend fun deleteAllCategoryMovie()
+
 }

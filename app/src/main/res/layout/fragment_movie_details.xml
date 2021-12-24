@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="@{Double.toString(movie.vote_average)}"
+            android:text='@{movie.vote_average != null ? Double.toString(movie.vote_average) : null}'
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@id/movieTitle"
             app:layout_constraintEnd_toEndOf="parent"
