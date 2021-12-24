@@ -1,4 +1,4 @@
-package com.fawry.task.data.models
+package com.fawry.task.data.models.entities
 
 import androidx.annotation.NonNull
 import androidx.room.Entity

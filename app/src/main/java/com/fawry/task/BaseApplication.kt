@@ -37,7 +37,7 @@ class BaseApplication : Application(), Configuration.Provider {
             .getInstance(this)
             .enqueueUniquePeriodicWork(
                 "sync-movies",
-                ExistingPeriodicWorkPolicy.REPLACE, //todo replace with KEEP
+                ExistingPeriodicWorkPolicy.KEEP,
                 task
             )
     }

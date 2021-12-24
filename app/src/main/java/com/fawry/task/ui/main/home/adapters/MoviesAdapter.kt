@@ -3,7 +3,7 @@ package com.fawry.task.ui.main.home.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.fawry.task.data.models.Movie
+import com.fawry.task.data.models.entities.Movie
 import com.fawry.task.databinding.MoviesListItemBinding
 
 class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {

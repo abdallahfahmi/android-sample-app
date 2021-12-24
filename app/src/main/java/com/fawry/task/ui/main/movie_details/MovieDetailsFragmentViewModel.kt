@@ -1,8 +1,7 @@
 package com.fawry.task.ui.main.movie_details
 
-import android.util.Log
 import androidx.lifecycle.*
-import com.fawry.task.data.models.Movie
+import com.fawry.task.data.models.entities.Movie
 import com.fawry.task.data.network.RemoteResult
 import com.fawry.task.data.repositories.movies_repository.IMoviesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

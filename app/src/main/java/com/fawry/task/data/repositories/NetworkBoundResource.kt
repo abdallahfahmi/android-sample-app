@@ -2,8 +2,6 @@ package com.fawry.task.data.repositories
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
-import com.fawry.task.data.models.Category
-import com.fawry.task.data.models.Movie
 import com.fawry.task.data.network.RemoteResult
 import kotlinx.coroutines.*
 

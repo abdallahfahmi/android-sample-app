@@ -1,10 +1,11 @@
 package com.fawry.task.data.repositories.movies_repository
 
 import com.fawry.task.data.database.AppDatabase
-import com.fawry.task.data.models.CategorizedMovies
-import com.fawry.task.data.models.Category
-import com.fawry.task.data.models.Movie
+import com.fawry.task.data.models.entities.CategorizedMovies
+import com.fawry.task.data.models.entities.Category
+import com.fawry.task.data.models.entities.Movie
 import com.fawry.task.data.network.APIsService
+import com.fawry.task.data.network.RemoteResult
 import com.fawry.task.data.repositories.BaseRepository
 import com.fawry.task.data.repositories.NetworkBoundResource
 import kotlinx.coroutines.*
@@ -28,13 +29,14 @@ class MoviesRepository @Inject constructor(
 
             /**
              * this function to decide whether we need to fetch from remote api or not
-             * in case user opened the app for the first time (before first 4 hours sync)
-             * or the cache got cleared
+             * in case cache got cleared
              * */
             override fun shouldFetch(data: List<CategorizedMovies>?): Boolean {
                 /**fetch from remote api if database is empty,
                  * otherwise return the cached movies from database and don't proceed */
                 return data == null
+
+                //check if worker status is running to avoid multiple sync
             }
 
             override suspend fun syncMoviesWithRemote() {
@@ -58,10 +60,15 @@ class MoviesRepository @Inject constructor(
         awaitAll(*concurrentTasks.toTypedArray())
     }
 
-    override suspend fun fetchMovieDetails(movieId: Int) =
-        makeSafeApiCall {
+    override suspend fun fetchMovieDetails(movieId: Int): RemoteResult<Movie> {
+
+        /**return throwable instead of safe*/
+
+        return makeSafeApiCall {
             remoteDataSource.fetchMovieById(movieId)
         }
+    }
+
 
     private suspend fun getCategoriesFromDB() = localDataSource.categoriesDao().getCategories()
 

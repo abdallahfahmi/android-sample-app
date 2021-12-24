@@ -1,8 +1,8 @@
 package com.fawry.task.data.network
 
-import com.fawry.task.data.models.CategoriesResponse
-import com.fawry.task.data.models.Movie
-import com.fawry.task.data.models.MoviesResponse
+import com.fawry.task.data.models.http.CategoriesResponse
+import com.fawry.task.data.models.entities.Movie
+import com.fawry.task.data.models.http.MoviesResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

@@ -5,7 +5,7 @@
 
         <variable
             name="movie"
-            type="com.fawry.task.data.models.Movie" />
+            type="com.fawry.task.data.models.entities.Movie" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
