@@ -37,6 +37,7 @@ class MoviesRepository @Inject constructor(
 
 
     override fun getMoviesCategorized(coroutineScope: CoroutineScope) =
+        //this class handles fetching from remote if no data available in local db
         object : NetworkBoundResource<List<CategorizedMovies>>(coroutineScope) {
 
             override suspend fun loadFromDb(): List<CategorizedMovies> {
@@ -45,11 +46,10 @@ class MoviesRepository @Inject constructor(
 
             /**
              * this function to decide whether we need to fetch from remote api or not
-             * in case cache got cleared (movies won't be fetched until next scheduled 4 hours)
-             * */
+             * in case user opens the app for the first time or data got cleared (movies won't be fetched until next scheduled 4 hours)
+             * it will fetch from remote only if database is empty,
+             * otherwise return the cached movies from database and don't proceed */
             override fun shouldFetch(data: List<CategorizedMovies>): Boolean {
-                /**fetch from remote api if database is empty,
-                 * otherwise return the cached movies from database and don't proceed */
                 return data.isEmpty()
             }
 

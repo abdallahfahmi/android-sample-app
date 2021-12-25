@@ -13,12 +13,12 @@ class InternetConnectionInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
 
         if (!networkConnectionManager.isConnectedToNetwork())
-            throw NoInternetException("No network available, please check your internet connection")
+            throw NoInternetException()
 
         return chain.proceed(chain.request())
 
     }
 
-    class NoInternetException(message: String) : IOException(message)
+    class NoInternetException : IOException()
 
 }

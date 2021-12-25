@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import com.fawry.task.data.network.RemoteResult
 import com.fawry.task.databinding.FragmentMovieDetailsBinding
 import com.fawry.task.ui.base.BaseFragment
 import com.fawry.task.utils.autoCleared
 import com.fawry.task.utils.show
-import com.fawry.task.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,22 +30,14 @@ class MovieDetailsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.movie.observe(viewLifecycleOwner) {
-            when (it.status) {
-                RemoteResult.Status.SUCCESS -> {
-                    binding.progressBar.show(false)
-                    binding.movie = it.data
-                }
-                RemoteResult.Status.ERROR -> {
-                    binding.progressBar.show(false)
-                    showToast(it.error?.message)
-                }
-                RemoteResult.Status.LOADING -> {
-                    binding.progressBar.show(true)
-                }
-            }
+        observeResult(viewModel.movie) {
+            binding.movie = it
         }
 
+    }
+
+    override fun isLoading(state: Boolean) {
+        binding.progressBar.show(state)
     }
 
 }

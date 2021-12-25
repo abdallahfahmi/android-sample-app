@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.fawry.task.data.models.entities.Movie
-import com.fawry.task.databinding.MoviesListItemBinding
+import com.fawry.task.databinding.ListItemMoviesBinding
 
 class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
@@ -18,7 +18,7 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ViewHolder(
-            MoviesListItemBinding.inflate(
+            ListItemMoviesBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -33,6 +33,6 @@ class MoviesAdapter : RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     override fun getItemCount() = movies.size
 
-    class ViewHolder(val binding: MoviesListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ListItemMoviesBinding) : RecyclerView.ViewHolder(binding.root)
 
 }

@@ -12,8 +12,8 @@ data class RemoteResult<out T>(
         fun <T> error(exception: Exception): RemoteResult<T> =
             RemoteResult(status = Status.ERROR, data = null, error = ErrorHandler.handle(exception))
 
-        fun <T> loading(data: T? = null): RemoteResult<T> =
-            RemoteResult(status = Status.LOADING, data = data, error = null)
+        fun <T> loading(): RemoteResult<T> =
+            RemoteResult(status = Status.LOADING, data = null, error = null)
     }
 
     enum class Status {
@@ -22,9 +22,6 @@ data class RemoteResult<out T>(
         LOADING
     }
 
-    fun isSuccess(): Boolean {
-        return status == Status.SUCCESS
-    }
 }
 
 data class ResultError(val type: ErrorHandler.ErrorType, val message: String? = null)

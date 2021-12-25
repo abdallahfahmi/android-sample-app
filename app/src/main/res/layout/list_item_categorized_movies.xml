@@ -28,5 +28,5 @@
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/genre"
-        tools:listitem="@layout/movies_list_item" />
+        tools:listitem="@layout/list_item_movies" />
 </androidx.constraintlayout.widget.ConstraintLayout>

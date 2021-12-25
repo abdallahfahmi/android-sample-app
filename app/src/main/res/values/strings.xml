@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Fawry Task</string>
+
+    <!--    error messages-->
+    <string name="bad_request_error_default_message">invalid data</string>
+    <string name="authentication_error_default_message">authentication error</string>
+    <string name="authorization_error_default_message">authorization error</string>
+    <string name="not_found_error_default_message">not found error</string>
+    <string name="server_error_default_message">server error</string>
+    <string name="time_out_error_default_message">time out error</string>
+    <string name="unknown_error_message">unknown error</string>
+    <string name="default_error_message">something went wrong</string>
+    <string name="no_internet_error_default_message">No network available, please check your internet connection</string>
+
 </resources>

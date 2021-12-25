@@ -13,23 +13,16 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
 
     init {
 
-        //pass viewModelScope to bound all the calls to the lifecycle of the viewModel
         scope.launch(Dispatchers.IO) {
 
-            val data = loadFromDb()
+            val cachedData = loadFromDb()
 
-            if (shouldFetch(data)) { //database is empty, fetch from remote
+            if (shouldFetch(cachedData)) { //database is empty, fetch from remote
 
                 result.postValue(RemoteResult.loading())
 
                 try {
                     //sync with server and wait until all data is written in database
-                    /**
-                     * this approach is better than manually starting the worker and observing its state
-                     * to update the movies list because here we can propagate any failure to the user
-                     * and guarantee a response unlike worker that can be retried several times
-                     * before fetching the movies
-                     */
                     syncWithRemote()
                     result.postValue(RemoteResult.success(loadFromDb()))
                 } catch (e: Exception) {
@@ -37,8 +30,8 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
                     result.postValue(RemoteResult.error(e))
                 }
 
-            } else { //return cached data
-                result.postValue(RemoteResult.success(data))
+            } else {
+                result.postValue(RemoteResult.success(cachedData))
             }
 
         }

@@ -1,4 +1,4 @@
-package com.fawry.task.data.services
+package com.fawry.task.data.workers
 
 import android.content.Context
 import android.util.Log
@@ -9,7 +9,6 @@ import com.fawry.task.data.repositories.movies_repository.IMoviesRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -21,8 +20,6 @@ class RemoteSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-
-        Log.e("background work", "fetch from remote server @ ${Date()}")
 
         return withContext(Dispatchers.IO) {
             try {

@@ -6,16 +6,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.fawry.task.data.models.entities.CategorizedMovies
 import com.fawry.task.data.models.entities.Movie
-import com.fawry.task.databinding.GenresListItemBinding
+import com.fawry.task.databinding.ListItemCategorizedMoviesBinding
 
-class GenresAdapter(
+class CategorizedMoviesAdapter(
     private val onMovieClicked: (Movie) -> Unit
-) : RecyclerView.Adapter<GenresAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<CategorizedMoviesAdapter.ViewHolder>() {
 
     private var items: List<CategorizedMovies> = listOf()
 
     private val scrollPosition =
-        hashMapOf<Int, Parcelable?>()  //save the scroll state of each genre list when scrolling
+        hashMapOf<Int, Parcelable?>()  //save the scroll state of each category list when scrolling
 
     fun updateList(items: List<CategorizedMovies>) {
         this.items = items
@@ -24,8 +24,12 @@ class GenresAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            GenresListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        ).also {    //set the adapter here not in onBind to avoid performance issues
+            ListItemCategorizedMoviesBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        ).also {    //set the adapter here not in onBind for better performance
             it.binding.moviesList.adapter = MoviesAdapter()
         }
     }
@@ -50,6 +54,7 @@ class GenresAdapter(
     override fun getItemCount() = items.size
 
 
-    class ViewHolder(val binding: GenresListItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ListItemCategorizedMoviesBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
 }
