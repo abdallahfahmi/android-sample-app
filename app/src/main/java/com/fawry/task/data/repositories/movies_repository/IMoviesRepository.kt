@@ -13,6 +13,6 @@ interface IMoviesRepository {
 
     suspend fun fetchMovieDetails(movieId: Int): RemoteResult<Movie>
 
-    suspend fun syncMoviesFromRemoteServer(scope: CoroutineScope = GlobalScope)
+    suspend fun syncMoviesFromRemoteServer(scope: CoroutineScope)
 
 }

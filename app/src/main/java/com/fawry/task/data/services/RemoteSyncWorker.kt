@@ -8,6 +8,9 @@ import androidx.work.WorkerParameters
 import com.fawry.task.data.repositories.movies_repository.IMoviesRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import java.util.*
 
 @HiltWorker
@@ -21,11 +24,13 @@ class RemoteSyncWorker @AssistedInject constructor(
 
         Log.e("background work", "fetch from remote server @ ${Date()}")
 
-        return try {
-            repository.syncMoviesFromRemoteServer()
-            Result.success()
-        } catch (e: Exception) {
-            Result.retry()
+        return withContext(Dispatchers.IO) {
+            try {
+                repository.syncMoviesFromRemoteServer(this)
+                Result.success()
+            } catch (e: Exception) {
+                Result.retry()
+            }
         }
 
     }

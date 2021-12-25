@@ -31,7 +31,7 @@ class BaseApplication : Application(), Configuration.Provider {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val task = PeriodicWorkRequestBuilder<RemoteSyncWorker>(15, TimeUnit.MINUTES, 13, TimeUnit.MINUTES)
+        val task = PeriodicWorkRequestBuilder<RemoteSyncWorker>(4, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 

@@ -24,7 +24,13 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
 
                 try {
                     //sync with server and wait until all data is written in database
-                    syncMoviesWithRemote()
+                    /**
+                     * this approach is better than manually starting the worker and observing its state
+                     * to update the movies list because here we can propagate any failure to the user
+                     * and guarantee a response unlike worker that can be retried several times
+                     * before fetching the movies
+                     */
+                    syncWithRemote()
                     result.postValue(RemoteResult.success(loadFromDb()))
                 } catch (e: Exception) {
                     //pass the error to the view in case network failed during sync
@@ -45,6 +51,6 @@ abstract class NetworkBoundResource<ResultType>(scope: CoroutineScope) {
     abstract fun shouldFetch(data: ResultType): Boolean
 
     @WorkerThread
-    abstract suspend fun syncMoviesWithRemote()
+    abstract suspend fun syncWithRemote()
 
 }
